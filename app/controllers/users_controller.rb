@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  #before_action :authorize, only: [:show]
+  before_action :authorize, only: [:show]
 
   def create
     newUser = User.create(user_params)
@@ -13,11 +13,7 @@ class UsersController < ApplicationController
 
   def show
     user = User.find_by(id: session[:user_id])
-    if user
       render json: user
-    else
-      render json: { error: "not authorized" }, status: :unauthorized
-    end
   end
 
   def destroy
@@ -28,6 +24,10 @@ class UsersController < ApplicationController
   private
   def user_params
     params.permit(:username, :password, :password_confirmation)
+  end
+
+  def authorize
+    return render json: { error: "Not authorized" }, status: :unauthorized unless session.include? :user_id
   end
 
 end
